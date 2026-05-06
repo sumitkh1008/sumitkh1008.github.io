@@ -1,4 +1,3 @@
-# sumitkh1008.github.io
 # 🚀 Markdown Rendering Test Suite
 ## Testing Subheaders and Typography
 
