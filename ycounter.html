@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
+    <meta name="theme-color" content="#3498db" />
+    <meta
+      name="description"
+      content="Audio Counter App with customizable settings"
+    />
+
+    <!-- PWA Meta Tags -->
+    <link rel="manifest" href="./manifest.json" />
+    <link rel="apple-touch-icon" href="./icons/icon-192x192.png" />
+    <link rel="apple-touch-startup-image" href="./icons/splash-640x1136.png" />
+
+    <!-- iOS specific meta tags -->
+    <meta name="apple-mobile-web-app-title" content="Audio Counter" />
+    <link
+      rel="apple-touch-icon"
+      sizes="152x152"
+      href="./icons/icon-152x152.png"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="./icons/icon-180x180.png"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="167x167"
+      href="./icons/icon-167x167.png"
+    />
+
+    <!-- iPhone Xs Max (1242px x 2688px) -->
+    <link
+      rel="apple-touch-startup-image"
+      media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3)"
+      href="./icons/splash-1242x2688.png"
+    />
+    <!-- iPhone Xr (828px x 1792px) -->
+    <link
+      rel="apple-touch-startup-image"
+      media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2)"
+      href="./icons/splash-828x1792.png"
+    />
+    <!-- iPhone X, Xs (1125px x 2436px) -->
+    <link
+      rel="apple-touch-startup-image"
+      media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3)"
+      href="./icons/splash-1125x2436.png"
+    />
+
+    <title>Audio Counter</title>
+    <style>
+      :root {
+        --primary-color: #3498db;
+        --secondary-color: #2ecc71;
+        --danger-color: #e74c3c;
+      }
+
+      * {
+        box-sizing: border-box;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          sans-serif;
+        margin: 0;
+        padding: 20px;
+        background: #f5f6fa;
+        min-height: 100vh;
+      }
+
+      .container {
+        max-width: 600px;
+        margin: 0 auto;
+        background: white;
+        padding: 20px;
+        border-radius: 15px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
+
+      .settings-group {
+        margin-bottom: 20px;
+        padding: 15px;
+        border: 1px solid #eee;
+        border-radius: 10px;
+      }
+
+      .settings-title {
+        font-weight: 600;
+        margin-bottom: 10px;
+        color: #2c3e50;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 5px;
+        color: #34495e;
+      }
+
+      input[type="number"],
+      input[type="range"],
+      select {
+        width: 100%;
+        padding: 8px;
+        margin-bottom: 10px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        font-size: 16px;
+      }
+
+      .button-group {
+        display: flex;
+        gap: 10px;
+        margin-top: 20px;
+      }
+
+      button {
+        flex: 1;
+        padding: 12px;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        color: white;
+        cursor: pointer;
+        transition: opacity 0.2s;
+      }
+
+      button:active {
+        opacity: 0.8;
+      }
+
+      .play-btn {
+        background-color: var(--secondary-color);
+      }
+
+      .stop-btn {
+        background-color: var(--danger-color);
+      }
+
+      .download-btn {
+        background-color: var(--primary-color);
+      }
+
+      .status {
+        text-align: center;
+        font-size: 24px;
+        font-weight: bold;
+        margin: 20px 0;
+        color: var(--primary-color);
+      }
+
+      .progress {
+        height: 10px;
+        background: #eee;
+        border-radius: 5px;
+        overflow: hidden;
+        margin: 10px 0;
+      }
+
+      .progress-bar {
+        height: 100%;
+        background: var(--primary-color);
+        width: 0%;
+        transition: width 0.2s;
+      }
+
+      @media (max-width: 480px) {
+        .button-group {
+          flex-direction: column;
+        }
+
+        button {
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="settings-group">
+        <div class="settings-title">Counter Settings</div>
+        <label>Count up to:</label>
+        <input type="number" id="maxCount" value="12" min="1" max="100" />
+
+        <label>Number of repetitions:</label>
+        <input type="number" id="repetitions" value="1" min="1" max="10" />
+
+        <label>Interval between numbers (seconds):</label>
+        <input
+          type="range"
+          id="interval"
+          min="1"
+          max="5"
+          value="2"
+          step="0.5"
+        />
+        <span id="intervalValue">2.0s</span>
+      </div>
+
+      <div class="settings-group">
+        <div class="settings-title">Sound Effects</div>
+        <label>Between repetitions:</label>
+        <select id="soundEffect">
+          <option value="bell">Bell</option>
+          <option value="chime">Chime</option>
+          <option value="ding">Ding</option>
+          <option value="none">None</option>
+        </select>
+      </div>
+
+      <div class="status" id="status">Ready</div>
+      <div class="progress">
+        <div class="progress-bar" id="progressBar"></div>
+      </div>
+
+      <div class="button-group">
+        <button class="play-btn" id="playBtn">Play</button>
+        <button class="stop-btn" id="stopBtn" disabled>Stop</button>
+        <button class="download-btn" id="downloadBtn">Download</button>
+      </div>
+    </div>
+
+    <script>
+      // Register Service Worker
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+          navigator.serviceWorker
+            .register("./sw.js")
+            .then((registration) => {
+              console.log("ServiceWorker registration successful");
+            })
+            .catch((err) => {
+              console.log("ServiceWorker registration failed: ", err);
+            });
+        });
+      }
+
+      class AudioCounter {
+        constructor() {
+          this.audioContext = null;
+          this.isPlaying = false;
+          this.currentCount = 0;
+          this.currentRepetition = 0;
+          this.recording = null;
+          this.mediaRecorder = null;
+          this.audioChunks = [];
+          this.hasEnabledVoice = false;
+
+          this.setupEventListeners();
+        }
+
+        setupEventListeners() {
+          document
+            .getElementById("playBtn")
+            .addEventListener("click", () => this.start());
+          document
+            .getElementById("stopBtn")
+            .addEventListener("click", () => this.stop());
+          document
+            .getElementById("downloadBtn")
+            .addEventListener("click", () => this.download());
+          document.getElementById("interval").addEventListener("input", (e) => {
+            document.getElementById(
+              "intervalValue"
+            ).textContent = `${e.target.value}s`;
+          });
+          document.addEventListener("click", () => {
+            if (hasEnabledVoice) {
+              return;
+            }
+            const lecture = new SpeechSynthesisUtterance("hello");
+            lecture.volume = 0;
+            speechSynthesis.speak(lecture);
+            this.hasEnabledVoice = true;
+          });
+        }
+
+        async initializeAudio() {
+          if (!this.audioContext) {
+            this.audioContext = new (window.AudioContext ||
+              window.webkitAudioContext)();
+          }
+
+          if (this.audioContext.state === "suspended") {
+            await this.audioContext.resume();
+          }
+        }
+
+        async createAudioStream() {
+          const dest = this.audioContext.createMediaStreamDestination();
+          this.mediaRecorder = new MediaRecorder(dest.stream);
+
+          this.mediaRecorder.ondataavailable = (e) => {
+            this.audioChunks.push(e.data);
+          };
+
+          this.mediaRecorder.onstop = () => {
+            const audioBlob = new Blob(this.audioChunks, { type: "audio/wav" });
+            this.recording = URL.createObjectURL(audioBlob);
+            document.getElementById("downloadBtn").disabled = false;
+          };
+
+          return dest;
+        }
+
+        async start() {
+          await this.initializeAudio();
+
+          const maxCount = parseInt(document.getElementById("maxCount").value);
+          const repetitions = parseInt(
+            document.getElementById("repetitions").value
+          );
+          const interval =
+            parseFloat(document.getElementById("interval").value) * 1000;
+
+          document.getElementById("playBtn").disabled = true;
+          document.getElementById("stopBtn").disabled = false;
+          document.getElementById("downloadBtn").disabled = true;
+
+          const dest = await this.createAudioStream();
+          this.mediaRecorder.start();
+
+          this.isPlaying = true;
+          this.currentCount = 0;
+          this.currentRepetition = 0;
+
+          const runSequence = async () => {
+            if (!this.isPlaying) return;
+
+            if (this.currentRepetition < repetitions) {
+              if (this.currentCount < maxCount) {
+                this.currentCount++;
+
+                const utterance = new SpeechSynthesisUtterance(
+                  this.currentCount.toString()
+                );
+                utterance.rate = 1;
+                utterance.pitch = 1;
+
+                document.getElementById("status").textContent = `Count: ${
+                  this.currentCount
+                } (Rep: ${this.currentRepetition + 1}/${repetitions})`;
+
+                const progress =
+                  ((this.currentRepetition * maxCount + this.currentCount) /
+                    (repetitions * maxCount)) *
+                  100;
+                document.getElementById(
+                  "progressBar"
+                ).style.width = `${progress}%`;
+
+                window.speechSynthesis.speak(utterance);
+
+                setTimeout(runSequence, interval);
+              } else {
+                if (this.currentRepetition < repetitions - 1) {
+                  const soundEffect = document.getElementById("soundEffect")
+                    .value;
+                  if (soundEffect !== "none") {
+                    await this.playSound(soundEffect);
+                  }
+
+                  this.currentCount = 0;
+                  this.currentRepetition++;
+                  setTimeout(runSequence, 2000);
+                } else {
+                  this.complete();
+                }
+              }
+            }
+          };
+
+          runSequence();
+        }
+
+        async playSound(type) {
+          let completionWord = "";
+          switch (type) {
+            case "bell":
+              completionWord = "Nitai Gaur Hari Bol ";
+              break;
+            case "chime":
+              completionWord = "Hari Hari Bol ";
+              break;
+            case "ding":
+              completionWord = "Jai Jagannath ";
+              break;
+          }
+          const utterance = new SpeechSynthesisUtterance(completionWord);
+          utterance.rate = 0.8;
+          utterance.pitch = 0.8;
+          window.speechSynthesis.speak(utterance);
+          return new Promise((resolve) => setTimeout(resolve, 100));
+        }
+
+        stop() {
+          this.isPlaying = false;
+          window.speechSynthesis.cancel();
+
+          if (this.mediaRecorder && this.mediaRecorder.state !== "inactive") {
+            this.mediaRecorder.stop();
+          }
+
+          document.getElementById("playBtn").disabled = false;
+          document.getElementById("stopBtn").disabled = true;
+          document.getElementById("status").textContent = "Stopped";
+        }
+
+        complete() {
+          this.isPlaying = false;
+
+          if (this.mediaRecorder && this.mediaRecorder.state !== "inactive") {
+            this.mediaRecorder.stop();
+          }
+
+          document.getElementById("playBtn").disabled = false;
+          document.getElementById("stopBtn").disabled = true;
+          document.getElementById("status").textContent = "Complete!";
+        }
+
+        download() {
+          if (!this.recording) return;
+
+          const a = document.createElement("a");
+          a.href = this.recording;
+          a.download = "counting-sequence.wav";
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+        }
+      }
+
+      // Initialize the app
+      const counter = new AudioCounter();
+    </script>
+    <!-- Add Install Prompt -->
+    <div
+      id="installPrompt"
+      style="
+        display: none;
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: white;
+        padding: 15px;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        z-index: 1000;
+      "
+    >
+      <p style="margin: 0 0 10px 0">Install this app on your iPhone</p>
+      <button
+        onclick="hideInstallPrompt()"
+        style="
+          background: #3498db;
+          color: white;
+          border: none;
+          padding: 8px 15px;
+          border-radius: 5px;
+        "
+      >
+        Got it!
+      </button>
+    </div>
+  </body>
+</html>
